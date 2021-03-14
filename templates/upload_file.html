@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Upload{% endblock %}
+
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+<script>
+    $(document).ready(function() {
+        document.getElementById('file').addEventListener('change', () => {
+            var form_data = new FormData($('#upload-file')[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/check',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) {
+                    if(data.status == 'success'){
+                        $('#process-button').removeAttr("disabled");
+                    }
+                    else
+                    {
+                        $('#process-button').attr("disabled", true);
+                    }
+                },
+            });
+        });
+
+        $('#process-button').click(function() {
+            var form_data = new FormData($('#upload-file')[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/process',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) {
+                    $("#message").text(data.status)
+                },
+            });
+        });
+
+    });
+
+</script>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div id="message" data-alert="alert"></div>
+      <hr>
+      <h1>Upload an image</h1>
+      <hr>
+      <form id="upload-file" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Select image</label>
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" name="file" id="file">
+            <button id="process-button" class="custom-file-input" type="button" disabled>Process</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
